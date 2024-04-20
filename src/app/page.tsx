@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { Welcome } from '~/app/sections/welcome'
+import { Canvas } from './components/canvas'
 
 const HomePage = () => {
   return (
     <>
-      <Welcome />
+      <Canvas />
     </>
   )
 }

@@ -3,7 +3,6 @@ import '~/css/global.scss'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
-import { Header } from '~/components/header'
 import { isDev, siteURL } from '~/lib/constants'
 
 const GridDebugger = dynamic(() => import('~/lib/debug/grid-debugger'), {
@@ -44,7 +43,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     <html lang="en">
       <body className={inter.variable}>
         <Providers>
-          <Header />
           {children}
           {isDev && <GridDebugger />}
           <AppHooks />
