@@ -1,12 +1,31 @@
 import { Box, Cone, Plane, Sphere, useTexture } from '@react-three/drei'
-import { useEffect, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
 import * as THREE from 'three'
 
 const HOUSE_HEIGHT = 2.5
 const HOUSE_WIDTH = 4
+const GHOSTS = [
+  {
+    color: '#ff00ff',
+    intensity: 2,
+    distance: 3
+  },
+  {
+    color: '#00ffff',
+    intensity: 2,
+    distance: 3
+  },
+  {
+    color: '#ff0000',
+    intensity: 2,
+    distance: 3
+  }
+]
 
 export const Scene = () => {
   const doorRef = useRef<THREE.Mesh>(null)
+  const ghostsRefs = useRef<THREE.PointLight[]>([])
   const [
     doorMap,
     doorAlphaMap,
@@ -30,6 +49,35 @@ export const Scene = () => {
     '/textures/bricks/ambientOcclusion.jpg',
     '/textures/bricks/roughness.jpg'
   ])
+
+  useFrame((state) => {
+    const elapsedTime = state.clock.getElapsedTime()
+    const ghost1Angle = elapsedTime * 0.5
+    const ghost2Angle = -elapsedTime * 0.32
+    const ghost3Angle = -elapsedTime * 0.18
+
+    ghostsRefs.current.forEach((ghost, idx) => {
+      if (idx === 0) {
+        ghost.position.x = Math.cos(ghost1Angle) * 4
+        ghost.position.z = Math.sin(ghost1Angle) * 4
+        ghost.position.y = Math.sin(elapsedTime * 3)
+      }
+      if (idx === 1) {
+        ghost.position.x = Math.sin(ghost2Angle) * 5
+        ghost.position.z = Math.cos(ghost2Angle) * 5
+        ghost.position.y =
+          Math.sin(elapsedTime * 4) * Math.sin(elapsedTime * 2.5)
+      }
+
+      if (idx === 2) {
+        ghost.position.x =
+          Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.32))
+        ghost.position.z =
+          Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5))
+        ghost.position.y = Math.sin(elapsedTime * 5) * Math.sin(elapsedTime * 2)
+      }
+    })
+  })
 
   return (
     <>
@@ -66,11 +114,13 @@ export const Scene = () => {
           intensity={0.8}
           distance={7}
           color="#ff7d46"
+          
         />
         {/* Walls */}
         <Box
           args={[HOUSE_WIDTH, HOUSE_HEIGHT, HOUSE_WIDTH]}
           position={[0, HOUSE_HEIGHT / 2, 0]}
+          castShadow
         >
           <meshStandardMaterial
             transparent
@@ -102,9 +152,23 @@ export const Scene = () => {
               args={[0.6, 0.8, 0.2]}
               position={[posX, 0.3, posZ]}
               rotation={[0, rotY, rotZ]}
+              castShadow
             >
               <meshStandardMaterial color="#b2b6b1" />
             </Box>
+          )
+        })}
+        {/* Ghosts */}
+        {GHOSTS.map((ghost, idx) => {
+          return (
+            <pointLight
+              key={idx}
+              ref={(ref) => {
+                ghostsRefs.current.push(ref!)
+              }}
+              {...ghost}
+              castShadow
+            />
           )
         })}
       </group>
@@ -116,24 +180,28 @@ export const Scene = () => {
 }
 
 const Floor = () => {
-  const [grassMap, grassNormalMap, grassAoMap, grassRoughnessMap] = useTexture([
-    '/textures/grass/color.jpg',
-    '/textures/grass/normal.jpg',
-    '/textures/grass/ambientOcclusion.jpg',
-    '/textures/grass/roughness.jpg'
-  ], (textures) => {
-    textures.forEach((texture) => {
-      texture.repeat.set(8, 8)
-      texture.wrapS = THREE.RepeatWrapping
-      texture.wrapT = THREE.RepeatWrapping
-    })
-  })
+  const [grassMap, grassNormalMap, grassAoMap, grassRoughnessMap] = useTexture(
+    [
+      '/textures/grass/color.jpg',
+      '/textures/grass/normal.jpg',
+      '/textures/grass/ambientOcclusion.jpg',
+      '/textures/grass/roughness.jpg'
+    ],
+    (textures) => {
+      textures.forEach((texture) => {
+        texture.repeat.set(8, 8)
+        texture.wrapS = THREE.RepeatWrapping
+        texture.wrapT = THREE.RepeatWrapping
+      })
+    }
+  )
 
   return (
     <Plane
       args={[20, 20]}
       rotation={[-Math.PI * 0.5, 0, 0]}
       position={[0, 0, 0]}
+      receiveShadow
     >
       <meshStandardMaterial
         map={grassMap}
