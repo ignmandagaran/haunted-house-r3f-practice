@@ -1,3 +1,8 @@
+'use client'
+
+import { Canvas as R3FCanvas } from '@react-three/fiber'
+
+import { OrbitControls } from '@react-three/drei'
 import { Box, Cone, Plane, Sphere, useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
@@ -23,7 +28,7 @@ const GHOSTS = [
   }
 ]
 
-export const Scene = () => {
+const Scene = () => {
   const doorRef = useRef<THREE.Mesh>(null)
   const ghostsRefs = useRef<THREE.PointLight[]>([])
   const [
@@ -114,7 +119,6 @@ export const Scene = () => {
           intensity={0.8}
           distance={7}
           color="#ff7d46"
-          
         />
         {/* Walls */}
         <Box
@@ -210,5 +214,30 @@ const Floor = () => {
         roughnessMap={grassRoughnessMap}
       />
     </Plane>
+  )
+}
+
+export const Lesson16HauntedHouseCanvas = () => {
+  return (
+    <R3FCanvas
+      style={{ height: '100vh', width: '100vw' }}
+      camera={{
+        position: [4, 2, 5],
+        fov: 75,
+        near: 0.1,
+        far: 100
+      }}
+    >
+      <ambientLight color="#b9d5ff" intensity={0.13} castShadow />
+      <directionalLight
+        color="#FFF"
+        intensity={0.13}
+        position={[4, 5, -2]}
+        castShadow
+      />
+      <OrbitControls />
+
+      <Scene />
+    </R3FCanvas>
   )
 }
