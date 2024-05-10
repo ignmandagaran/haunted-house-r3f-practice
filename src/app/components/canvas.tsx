@@ -1,7 +1,8 @@
 'use client'
 
-import { Lesson17ParticlesCanvas } from './lessons/17-particles'
+import { Lesson18GalaxyGeneratorCanvas } from "./lessons/18-galaxy-generator"
+
 
 export const Canvas = () => {
-  return <Lesson17ParticlesCanvas />
+  return <Lesson18GalaxyGeneratorCanvas />
 }

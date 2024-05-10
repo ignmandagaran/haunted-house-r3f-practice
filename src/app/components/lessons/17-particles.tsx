@@ -11,6 +11,7 @@ const COUNT = 5000
 const Scene = () => {
   const particlesGeometryRef = useRef<THREE.BufferGeometry>(null)
   const particleTexture = useTexture('/textures/particles/8.png')
+  
   const points = useMemo(() => {
     const positions = new Float32Array(COUNT * 3)
     positions.forEach((_, i) => {
